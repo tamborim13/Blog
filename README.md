@@ -1,3 +1,3 @@
-#BLOG
+# Blog
 
--Esse é o blog criado no curso python
+- Esse é o blog criado no curso python
