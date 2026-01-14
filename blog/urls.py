@@ -1,11 +1,11 @@
 from django.urls import path
 from django.contrib import admin
-from blog.views import index, page, post, created_by,category,tag,search
+from blog.views import PostListView, page, post, created_by,category,tag,search
 
 app_name = 'blog'
 
 urlpatterns = [
-    path('', index, name='index'),
+    path('', PostListView.as_view(), name='PostListView'),
     path('page/<slug:slug>/', page, name='page'),
     path('post/<slug:slug>/', post, name='post'),
     path('created_by/<int:author_pk>/', created_by, name='created_by'),
