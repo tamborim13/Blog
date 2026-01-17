@@ -15,6 +15,15 @@ class PostListView(ListView):
     paginate_by = PER_PAGE
     queryset = Post.objects.get_published()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            'page_title': 'Home - ',
+        })
+
+        return context
+
 
 class CreatedByListView(PostListView):
     def __init__(self, **kwargs: Any) -> None:
@@ -38,7 +47,7 @@ class CreatedByListView(PostListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.filter(create_by = self._temp_context['user'].pk)
+        qs = qs.filter(created_by__pk=self._temp_context['user'].pk)
         return qs
 
     def get(self, request, *args, **kwargs):
@@ -52,6 +61,8 @@ class CreatedByListView(PostListView):
             'author_pk': author_pk,
             'user': user,
         })
+
+        return super().get(request, *args, **kwargs)
 
 class CategoryListView(PostListView):
     allow_empty = False
@@ -70,7 +81,7 @@ class CategoryListView(PostListView):
 
 class TagListView(PostListView):
     allow_empty = False
-    
+
     def get_queryset(self):
         return super().get_queryset().filter(tags__slug=self.kwargs.get('slug'))
     
@@ -80,6 +91,8 @@ class TagListView(PostListView):
         ctx.update({
             'page_title' : page_title
         })
+
+        return ctx
 
 class SearchListView(PostListView):
     def __init__(self, *args,**kwargs):
