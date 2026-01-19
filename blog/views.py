@@ -5,7 +5,7 @@ from blog.models import Post, Page
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.http import Http404
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 PER_PAGE = 9
 
@@ -126,44 +126,40 @@ class SearchListView(PostListView):
 
         return super().get(*args, **kwargs)
 
+class PageDetailView(DetailView):
+    model = Page
+    template_name = 'blog/pages/page.html'
+    slug_field = 'slug'
+    context_object_name = 'page'
 
-def page(request, slug):
-    pages = (
-        Page.objects.filter(is_published = True).filter(slug=slug)
-        .first()
-        )
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        page = self.get_object()
+        page_title = f'{page.title} - Página - '
+        ctx.update({
+            'page_title': page_title
+        })
+        return ctx
     
-    if pages is None:
-        raise Http404()
-
-    page_title = f'{pages.title} - Pagina '
-
-    return render(
-        request,
-        'blog/pages/page.html',
-        {
-            'page': pages,
-            'page_title': page_title,
-        }
-    )
-
-
-def post(request, slug):
-    posts = (
-        Post.objects.get_published().filter(slug=slug)
-        .first()
-        )
+    def get_queryset(self):
+        return super().get_queryset().filter(is_published = True)
     
-    if posts is None:
-        raise Http404()
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'blog/pages/post.html'
+    context_object_name = 'post'
 
-    page_title = f'{posts.title} - Posts '
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        post = self.get_object()
+        page_title = f'{post.title} - Post - '
+        ctx.update({
+            'page_title': page_title
+        })
+        return ctx
+    
+    def get_queryset(self):
+        return super().get_queryset().filter(is_published = True)
+    
 
-    return render(
-        request,
-        'blog/pages/post.html',
-        {
-            'post': posts,
-            'page_title': page_title,
-        }
-    )
+
